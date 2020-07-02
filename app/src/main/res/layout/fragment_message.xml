@@ -6,15 +6,30 @@
     android:layout_height="match_parent"
     tools:layout_editor_absoluteY="81dp">
 
-    <Button
-        android:id="@+id/send_button"
+    <LinearLayout
+        android:id="@+id/llButtons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="Send"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="@+id/message_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/message_text" />
+        app:layout_constraintTop_toTopOf="@+id/message_text" >
+
+        <Button
+            android:id="@+id/send_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Send"/>
+
+        <Button
+            android:id="@+id/get_messages_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="Get Messages"/>
+
+    </LinearLayout>
 
     <EditText
         android:id="@+id/message_text"
@@ -26,7 +41,7 @@
         android:hint="send a message"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/send_button"
+        app:layout_constraintEnd_toStartOf="@+id/llButtons"
         app:layout_constraintStart_toEndOf="@+id/message_mention" />
 
     <android.support.v7.widget.RecyclerView

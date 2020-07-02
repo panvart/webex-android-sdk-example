@@ -169,19 +169,21 @@ public class MessageFragment extends BaseFragment {
                 if (f.exists()) {
                     Ln.i("select file: " + f);
                     LocalFile.Thumbnail thumbnail = null;
-                    if (MimeUtils.getContentTypeByFilename(f.getName()) == MimeUtils.ContentType.IMAGE){
+                    if (MimeUtils.getContentTypeByFilename(f.getName()) == MimeUtils.ContentType.IMAGE) {
                         Bitmap bitmap= BitmapFactory.decodeFile(f.getAbsolutePath());
                         thumbnail = new LocalFile.Thumbnail(f, null, bitmap.getWidth(), bitmap.getHeight());
                         bitmap.recycle();
                     }
-                    LocalFile localFile = new LocalFile(f, null, thumbnail, v -> textStatus.setText(String.format("sending %s...  %s%%", f.getName(), v)));
+                    LocalFile localFile = new  LocalFile(f, null, thumbnail, v -> textStatus.setText(String.format("sending %s...  %s%%", f.getName(), v)));
                     arrayList.add(localFile);
                 }
             }
+            LocalFile[] localFile = new LocalFile[arrayList.size()];
+            arrayList.toArray(localFile);
+            return localFile;
+        } else {
+            return null;
         }
-        LocalFile[] localFile = new LocalFile[arrayList.size()];
-        arrayList.toArray(localFile);
-        return localFile;
     }
 
     private Mention[] generateMentions() {
@@ -194,9 +196,13 @@ public class MessageFragment extends BaseFragment {
                 mentionList.add(new Mention.Person(((Membership)o).getPersonId()));
             }
         }
-        Mention[] mentionArray = new Mention[mentionList.size()];
-        mentionList.toArray(mentionArray);
-        return mentionArray;
+        if(mentionList.isEmpty()) {
+            return null;
+        } else {
+            Mention[] mentionArray = new Mention[mentionList.size()];
+            mentionList.toArray(mentionArray);
+            return mentionArray;
+        }
     }
 
     private void hideSoftKeyboard() {
@@ -224,6 +230,28 @@ public class MessageFragment extends BaseFragment {
         //text_mention.setVisibility(View.GONE);
         textMessage.clearFocus();
         hideSoftKeyboard();
+    }
+
+    @OnClick(R.id.get_messages_button)
+    protected void getMessages(View btn) {
+        int count = 50;
+        long reqId = System.currentTimeMillis();
+        Ln.d("Request["+reqId+"]: "+count+" messages from Webex...");
+        messageClient.list(targetId, null, 50, null, result -> {
+
+            StringBuilder message = new StringBuilder("Result["+reqId+"]: ");
+            if(result.isSuccessful())   {
+                message.append("SUCCESS | ");
+                if(result.getData()!=null)  {
+                    message.append(result.getData().size());
+                    message.append(" messages received");
+                }
+                else message.append("no messages received");
+            } else {
+                message.append("FAILURE | No data received");
+            }
+            Ln.d(message.toString());
+        });
     }
 
 
