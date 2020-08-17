@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -80,6 +81,11 @@ public class MessageFragment extends BaseFragment {
     @BindView(R.id.membership_recyclerview)
     RecyclerView recyclerMembership;
 
+    @BindView(R.id.send_button)
+    Button sendButton;
+
+    private String spaceId = null;
+
     MessageAdapter adapterMessage;
 
     MembershipAdapter adapterMembership;
@@ -129,6 +135,9 @@ public class MessageFragment extends BaseFragment {
             if (evt instanceof MessageObserver.MessageReceived) {
                 MessageObserver.MessageReceived event = (MessageObserver.MessageReceived) evt;
                 Ln.i("message: " + event.getMessage());
+                spaceId = event.getMessage().getSpaceId();
+                sendButton.setEnabled(true);
+
                 adapterMessage.mData.add(event.getMessage());
                 adapterMessage.notifyDataSetChanged();
                 //if (event.getMessage().getPersonEmail().equals("sparksdktestuser16@tropo.com")) {
@@ -219,10 +228,11 @@ public class MessageFragment extends BaseFragment {
     public void sendMessage(View btn) {
         if (!TextUtils.isEmpty(textMessage.getText())) {
             btn.setEnabled(false);
-            messageClient.postToSpace(targetId, textMessage.getText().toString(), generateMentions(), generateLocalFiles(), rst -> {
+            messageClient.postToSpace(spaceId, textMessage.getText().toString(), generateMentions(), generateLocalFiles(), rst -> {
                 Ln.e("posted:" + rst);
                 selectedFile.clear();
                 btn.setEnabled(true);
+                spaceId = rst.isSuccessful()?rst.getData().getSpaceId():null;
             });
             textStatus.setText("sending ...");
             textMessage.setText("");
@@ -237,7 +247,8 @@ public class MessageFragment extends BaseFragment {
         int count = 50;
         long reqId = System.currentTimeMillis();
         Ln.d("Request["+reqId+"]: "+count+" messages from Webex...");
-        messageClient.list(targetId, null, 50, null, result -> {
+
+        messageClient.list(spaceId, null, 50, null, result -> {
 
             StringBuilder message = new StringBuilder("Result["+reqId+"]: ");
             if(result.isSuccessful())   {
