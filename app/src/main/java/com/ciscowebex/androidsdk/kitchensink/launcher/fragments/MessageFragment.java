@@ -26,6 +26,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ciscowebex.androidsdk.kitchensink.R;
 import com.ciscowebex.androidsdk.kitchensink.actions.WebexAgent;
@@ -262,6 +263,7 @@ public class MessageFragment extends BaseFragment {
                 message.append("FAILURE | No data received");
             }
             Ln.d(message.toString());
+            Toast.makeText(getActivity(), message.toString(), Toast.LENGTH_SHORT).show();
         });
     }
 
